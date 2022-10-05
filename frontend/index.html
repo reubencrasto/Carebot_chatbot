@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <div id="title">
+      <h1>CareBot</h1>
+    </div>
+    <div>
+      <div id="chatbox" onload="getBotResponse()">
+        <p class="botText">
+          <span
+            >Hello, I am CareBot your friendly mental health chat bot. To
+            perform an initial diagnosis I would like to ask a series of
+            questions</span
+          >
+        </p>
+        <p class="botText">
+          <span
+            >Please indicate for each of the following of the five statements
+            which is closest to how you have been feeling over the past two
+            weeks</span
+          >
+        </p>
+        <p class="botText">
+          <span
+            >Rate your response on a scale from 0 to 5 where 0-At no time,
+            1-Some of the time, 2-Less than half of the time, 3-More than half
+            of the time, 4-Most of the time, 5-All the time</span
+          >
+        </p>
+        <p class="botText">
+          <span>I have felt cheerful and in good spirits</span>
+        </p>
+      </div>
+      <div id="userInput">
+        <input id="textInput" type="text" name="msg" placeholder="Message" />
+        <input id="buttonInput" type="submit" value="Send" />
+      </div>
+      <script>
+        const quest = [
+          ".",
+          "--",
+          "My daily life has been filled with things that interest me",
+          "I woke up feeling fresh and rested",
+          "I have felt active and vigorous",
+          "I have felt calm and relaxed",
+        ];
+        
+        const scores = [];
+        function getBotResponse() {
+          const q = quest.pop();
+          
+          if (q !== undefined) {
+            if (q === "--") {
+              console.log("Hi");
+              quest.pop();
+              var message = $("#textInput").val();
+              var userHtml =
+                '<p class="userText"><span>' + message + "</span></p>";
+              $("#textInput").val("");
+              $("#chatbox").append(userHtml);
+
+              scores.push(Number.parseFloat(message));
+              const totalScore = scores.reduce((a, b) => a + b) * 4;
+              console.log(totalScore);
+              $("#chatbox").append(
+                `<p class="botText"><span>According to your responses you have achieved a score of ${totalScore} %</span></p>`
+              );
+
+              if (totalScore < 54) {
+                $("#chatbox").append(
+                  `<p class="botText"><span>I recommend you seek professional help( your therapist/family doctor). If you would still like to converse with me then feel free to do so</span></p>`
+                );
+                
+                
+              } else if (totalScore < 68) {
+                $("#chatbox").append(
+                  `<p class="botText"><span>Your mental health score shows that while you have a positive outlook, you tend to have a moments when you feel low. You can converse with me or if you would like to take it forward, you could seek professional help</span></p>`
+                );
+              } else {
+                $("#chatbox").append(
+                  `<p class="botText"><span>You appear to have a higher state of mental well-being. If you have any problems you can still converse with me </span></p>`
+                );
+              }
+            } else {
+              var message = $("#textInput").val();
+              var userHtml =
+                '<p class="userText"><span>' + message + "</span></p>";
+              $("#textInput").val("");
+              $("#chatbox").append(userHtml);
+              $("#chatbox").append(`<p class="botText"><span>${q}</span></p>`);
+              scores.push(Number.parseFloat(message));
+            }
+          } else {
+            var message = $("#textInput").val();
+
+            var userHtml =
+              '<p class="userText"><span>' + message + "</span></p>";
+            $("#textInput").val("");
+            $("#chatbox").append(userHtml);
+            //document.getElementById('incoming_msg').scrollIntoView({block: 'start', behavior: 'smooth'});
+            fetch("http://127.0.0.1:5000/bot", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ message }),
+            })
+              .then((res) => res.json())
+              .then((json) => {
+                $("#chatbox").append(
+                  `<p class="botText"><span>${json.resp}</span></p>`
+                );
+                console.log(json);
+              });
+          }
+
+          //$.get("/get", { msg: rawText }).done(function(data)
+          //{
+          //var botHtml = '<p class="botText"><span>' + data + '</span></p>';
+          //$("#chatbox").append(botHtml);
+          //document.getElementById('userInput').scrollIntoView({block: 'start', behavior: 'smooth'});
+          // });
+        }
+        $("#textInput").keypress(function (e) {
+          if (
+            e.which == 13 &&
+            document.getElementById("textInput").value != ""
+          ) {
+            getBotResponse();
+          }
+        });
+        $("#buttonInput").click(function () {
+          if (document.getElementById("textInput").value != "") {
+            getBotResponse();
+          }
+        });
+      </script>
+    </div>
+  </body>
+</html>
