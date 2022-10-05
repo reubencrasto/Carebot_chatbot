@@ -1,2 +1,9 @@
 # Carebot_chatbot
 A chatbot specifically fine-tuned to catered for mental health related conversations. 
+This module is coded to construct the chatbot using the fine-tuned model that has been trained and tested. It takes the user input and invokes the model to generate a sentence or series of sentences in reply. The tokenizer is an inbuilt tokenizer which is imported along with the DialoGPT medium model. The fine-tuned model is also loaded as model. AutoTokenizer and AutoModelWithLMHead are the instances used to achieve this. 
+The new_user_input_ids was used to store the user input as it is entered. While accepting the user input, it attaches an eos (End of sentence ) token. bot_input_id is instrumental in keeping track of the chat history which stores the tokens of the previous reply and uses that along with the current user input to generate a reply. The  model.generate function has all the necessary parameters to follow while generating the reply which is stored in chat_history_ids. It uses CUDA which makes use of GPU utilization, resulting in faster response generation as compared to running it on the processor.
+The reply is then created by using the decoder part of the model, which takes all the above-mentioned functions into consideration while generating the output.
+The __main__ method starts the chatting process until the user types a “thank you” statement which triggers the end of the application.
+In order to provide a user-friendly interface, it was decided to develop a web application which to user can interact with. A flask server was added to fetch the user input from the web application and send it to the model using “POST” method. The generated response is sent to the web app through the server. The web app is developed with HTML, CSS, JavaScript and uses jQuery to pass arguments.
+
+
